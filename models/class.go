@@ -35,10 +35,10 @@ type Class struct {
 // @Property EndDate string "End date of the class"
 // @Property Capacity int "Maximum capacity of the class"
 type CreateClassRequest struct {
-	Name      string `json:"name"`       // @Description Name of the class
-	StartDate Date   `json:"start_date"` // @Description Start date of the class in YYYY-MM-DD format
-	EndDate   Date   `json:"end_date"`   // @Description End date of the class in YYYY-MM-DD format
-	Capacity  int    `json:"capacity"`   // @Description Maximum capacity of the class
+	Name      string `json:"name" binding:"required"`       // @Description Name of the class
+	StartDate Date   `json:"start_date" binding:"required"` // @Description Start date of the class in YYYY-MM-DD format
+	EndDate   Date   `json:"end_date" binding:"required"`   // @Description End date of the class in YYYY-MM-DD format
+	Capacity  int    `json:"capacity" binding:"required"`   // @Description Maximum capacity of the class
 }
 
 type Date time.Time

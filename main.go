@@ -27,8 +27,8 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Register routes
-	routes.RegisterClassRoutes(r)
-	routes.RegisterBookingRoutes(r)
+	routes.RegisterClassRoutes(r, storage.DB)
+	routes.RegisterBookingRoutes(r, storage.DB)
 
 	log.Fatal(r.Run(":8080"))
 }

@@ -6,11 +6,14 @@ import (
 	"github.com/sivadath/glofox/storage"
 )
 
-const Version = "/api/v1"
+const (
+	Version          = "/api/v1"
+	EndPointBookings = "/bookings"
+)
 
-func RegisterBookingRoutes(r *gin.Engine) {
-	bc := controllers.NewBookingController(storage.DB)
-	bookingRoutes := r.Group(Version + "/bookings")
+func RegisterBookingRoutes(r *gin.Engine, db storage.Storage) {
+	bc := controllers.NewBookingController(db)
+	bookingRoutes := r.Group(Version + EndPointBookings)
 	bookingRoutes.POST("", bc.CreateBooking)
 	bookingRoutes.GET("", bc.GetBookings)
 }

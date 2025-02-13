@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sivadath/glofox/internal/errors"
 	"github.com/sivadath/glofox/models"
 	"github.com/sivadath/glofox/storage"
 	"net/http"
@@ -50,7 +51,7 @@ type CreateBookingRequest struct {
 func (bc *bookingController) CreateBooking(c *gin.Context) {
 	var req CreateBookingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errors.ErrInvalidRequest.Respond(c)
 		return
 	}
 
@@ -60,23 +61,26 @@ func (bc *bookingController) CreateBooking(c *gin.Context) {
 	}
 	date, err := time.Parse(time.DateOnly, req.Date)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errors.NewError(err.Error(), http.StatusBadRequest).Respond(c)
 		return
 	}
 	classes, err := bc.storage.GetClassesByDate(c, date)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
+		return
 	}
 
 	if len(classes) == 0 {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.ErrNoClassesFound.Respond(c)
+		return
 	}
 	// For simplicity considering only first class fetched among all available classes
 	booking.ClassID = classes[0].ID
 
 	newBooking, err := bc.storage.AddBooking(c, booking)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
+		return
 	}
 	c.JSON(http.StatusCreated, newBooking)
 }
@@ -92,7 +96,7 @@ func (bc *bookingController) CreateBooking(c *gin.Context) {
 func (bc *bookingController) GetBookings(c *gin.Context) {
 	bookings, err := bc.storage.GetBookings(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 	}
 	c.JSON(http.StatusOK, bookings)
 }

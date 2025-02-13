@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sivadath/glofox/internal/errors"
 	"github.com/sivadath/glofox/models"
 	"github.com/sivadath/glofox/storage"
 	"net/http"
@@ -36,11 +37,11 @@ func NewClassController(s storage.Storage) ClassController {
 func (cc *classController) CreateClass(c *gin.Context) {
 	var req models.CreateClassRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errors.ErrInvalidRequest.Respond(c)
 		return
 	}
 	if req.EndDate.Time().Before(req.StartDate.Time()) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "end time cannot be later to start time"})
+		errors.ErrDateMismatch.Respond(c)
 		return
 	}
 	newClass, err := cc.storage.AddClass(c, models.Class{
@@ -50,7 +51,8 @@ func (cc *classController) CreateClass(c *gin.Context) {
 		Capacity:  req.Capacity,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
+		return
 	}
 	c.JSON(http.StatusCreated, newClass)
 }
@@ -66,7 +68,8 @@ func (cc *classController) CreateClass(c *gin.Context) {
 func (cc *classController) GetClasses(c *gin.Context) {
 	classes, err := cc.storage.GetClasses(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errors.ErrInternalServer.Respond(c)
+		return
 	}
 	c.JSON(http.StatusOK, classes)
 }

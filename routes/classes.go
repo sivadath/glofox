@@ -6,9 +6,11 @@ import (
 	"github.com/sivadath/glofox/storage"
 )
 
-func RegisterClassRoutes(r *gin.Engine) {
-	cc := controllers.NewClassController(storage.DB)
-	classRoutes := r.Group(Version + "/classes")
+const EndPointClasses = "/classes"
+
+func RegisterClassRoutes(r *gin.Engine, db storage.Storage) {
+	cc := controllers.NewClassController(db)
+	classRoutes := r.Group(Version + EndPointClasses)
 
 	classRoutes.POST("", cc.CreateClass)
 	classRoutes.GET("", cc.GetClasses)
