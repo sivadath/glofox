@@ -1,0 +1,178 @@
+basePath: /
+definitions:
+  controllers.CreateBookingRequest:
+    description: Create a new booking with the provided details
+    properties:
+      date:
+        description: '@Description Date for the booking in YYYY-MM-DD format'
+        type: string
+      name:
+        description: '@Description Name of the person making the booking'
+        type: string
+    required:
+    - date
+    - name
+    type: object
+  controllers.ErrorResponse:
+    description: Standard error response structure
+    properties:
+      details:
+        type: string
+      error:
+        type: string
+    type: object
+  models.Booking:
+    description: Booking information
+    properties:
+      class_id:
+        description: '@Description ID of the associated class'
+        type: string
+      date:
+        description: '@Description Date of the booking in YYYY-MM-DD format'
+        type: string
+      id:
+        description: '@Description ID of the booking'
+        type: string
+      name:
+        description: '@Description Name of the person who made the booking'
+        type: string
+    type: object
+  models.Class:
+    description: Class information
+    properties:
+      capacity:
+        description: '@Description Maximum capacity of the class'
+        type: integer
+      end_date:
+        description: '@Description End date of the class in YYYY-MM-DD format'
+        type: string
+      id:
+        description: '@Description ID of the class'
+        type: string
+      name:
+        description: '@Description Name of the class'
+        type: string
+      start_date:
+        description: '@Description Start date of the class in YYYY-MM-DD format'
+        type: string
+    type: object
+  models.CreateClassRequest:
+    description: Class creation request
+    properties:
+      capacity:
+        description: '@Description Maximum capacity of the class'
+        type: integer
+      end_date:
+        description: '@Description End date of the class in YYYY-MM-DD format'
+        type: string
+      name:
+        description: '@Description Name of the class'
+        type: string
+      start_date:
+        description: '@Description Start date of the class in YYYY-MM-DD format'
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing classes and bookings in a fitness studio.
+  title: Glofox API
+  version: "1.0"
+paths:
+  /bookings:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all bookings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of bookings
+          schema:
+            items:
+              $ref: '#/definitions/models.Booking'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      tags:
+      - Booking
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Booking Information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateBookingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Booking created successfully
+          schema:
+            $ref: '#/definitions/models.Booking'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      summary: Create a new booking
+      tags:
+      - Booking
+  /classes:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all classes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of classes
+          schema:
+            items:
+              $ref: '#/definitions/models.Class'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      tags:
+      - Class
+    post:
+      consumes:
+      - application/json
+      description: Create a new class with the provided details
+      parameters:
+      - description: Class Information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Class created successfully
+          schema:
+            $ref: '#/definitions/models.Class'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      tags:
+      - Class
+swagger: "2.0"

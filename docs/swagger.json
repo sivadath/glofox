@@ -1,0 +1,263 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for managing classes and bookings in a fitness studio.",
+        "title": "Glofox API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/bookings": {
+            "get": {
+                "description": "Get a list of all bookings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of bookings",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Booking"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "Create a new booking",
+                "parameters": [
+                    {
+                        "description": "Booking Information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.CreateBookingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Booking created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.Booking"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/classes": {
+            "get": {
+                "description": "Get a list of all classes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Class"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of classes",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Class"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new class with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Class"
+                ],
+                "parameters": [
+                    {
+                        "description": "Class Information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateClassRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Class created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.Class"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.CreateBookingRequest": {
+            "description": "Create a new booking with the provided details",
+            "type": "object",
+            "required": [
+                "date",
+                "name"
+            ],
+            "properties": {
+                "date": {
+                    "description": "@Description Date for the booking in YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "@Description Name of the person making the booking",
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.ErrorResponse": {
+            "description": "Standard error response structure",
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Booking": {
+            "description": "Booking information",
+            "type": "object",
+            "properties": {
+                "class_id": {
+                    "description": "@Description ID of the associated class",
+                    "type": "string"
+                },
+                "date": {
+                    "description": "@Description Date of the booking in YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "@Description ID of the booking",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "@Description Name of the person who made the booking",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Class": {
+            "description": "Class information",
+            "type": "object",
+            "properties": {
+                "capacity": {
+                    "description": "@Description Maximum capacity of the class",
+                    "type": "integer"
+                },
+                "end_date": {
+                    "description": "@Description End date of the class in YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "@Description ID of the class",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "@Description Name of the class",
+                    "type": "string"
+                },
+                "start_date": {
+                    "description": "@Description Start date of the class in YYYY-MM-DD format",
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateClassRequest": {
+            "description": "Class creation request",
+            "type": "object",
+            "properties": {
+                "capacity": {
+                    "description": "@Description Maximum capacity of the class",
+                    "type": "integer"
+                },
+                "end_date": {
+                    "description": "@Description End date of the class in YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "@Description Name of the class",
+                    "type": "string"
+                },
+                "start_date": {
+                    "description": "@Description Start date of the class in YYYY-MM-DD format",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
