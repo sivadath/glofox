@@ -25,6 +25,7 @@ func NewInMemoryStorage() *InMemoryStorage {
 func (s *InMemoryStorage) AddClass(ctx context.Context, class models.Class) (models.Class, error) {
 	class.ID = uuid.NewString()
 	s.classLock.Lock()
+	// This will create panic when count of bookings is greater than INTMAX
 	s.classes = append(s.classes, class)
 	s.classLock.Unlock()
 	return class, nil
@@ -53,6 +54,7 @@ func (s *InMemoryStorage) GetClassesByDate(ctx context.Context, date time.Time) 
 func (s *InMemoryStorage) AddBooking(ctx context.Context, booking models.Booking) (models.Booking, error) {
 	booking.ID = uuid.NewString()
 	s.bookingsLock.Lock()
+	// This will create panic when count of bookings is greater than INTMAX
 	s.bookings = append(s.bookings, booking)
 	s.bookingsLock.Unlock()
 	return booking, nil

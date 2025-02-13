@@ -5,6 +5,7 @@ import (
 	"github.com/sivadath/glofox/internal/errors"
 	"github.com/sivadath/glofox/models"
 	"github.com/sivadath/glofox/storage"
+	"log"
 	"net/http"
 	"time"
 )
@@ -51,6 +52,7 @@ type CreateBookingRequest struct {
 func (bc *bookingController) CreateBooking(c *gin.Context) {
 	var req CreateBookingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("Invalid request params: %v\n", err)
 		errors.ErrInvalidRequest.Respond(c)
 		return
 	}
@@ -61,16 +63,19 @@ func (bc *bookingController) CreateBooking(c *gin.Context) {
 	}
 	date, err := time.Parse(time.DateOnly, req.Date)
 	if err != nil {
+		log.Printf("Unexpected data format: %v, supported format (2006-01-02 for 2nd jan 2006)\n", err)
 		errors.NewError(err.Error(), http.StatusBadRequest).Respond(c)
 		return
 	}
 	classes, err := bc.storage.GetClassesByDate(c, date)
 	if err != nil {
+		log.Printf("Failed to fetch classes for given date: %v\n", err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 		return
 	}
 
 	if len(classes) == 0 {
+		log.Printf("No classes found for given %s: %v\n", date.String(), errors.ErrNoClassesFound)
 		errors.ErrNoClassesFound.Respond(c)
 		return
 	}
@@ -79,9 +84,11 @@ func (bc *bookingController) CreateBooking(c *gin.Context) {
 
 	newBooking, err := bc.storage.AddBooking(c, booking)
 	if err != nil {
+		log.Printf("Failed to insert bookings to db: %v\n", err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 		return
 	}
+	log.Printf("Booking created successfully: %v\n", newBooking)
 	c.JSON(http.StatusCreated, newBooking)
 }
 
@@ -96,8 +103,11 @@ func (bc *bookingController) CreateBooking(c *gin.Context) {
 func (bc *bookingController) GetBookings(c *gin.Context) {
 	bookings, err := bc.storage.GetBookings(c)
 	if err != nil {
+		log.Printf("Failed to fetch available bookings: %v\n", err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
+		return
 	}
+	log.Printf("Returning available bookings")
 	c.JSON(http.StatusOK, bookings)
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/sivadath/glofox/internal/errors"
 	"github.com/sivadath/glofox/models"
 	"github.com/sivadath/glofox/storage"
+	"log"
 	"net/http"
 )
 
@@ -37,10 +38,12 @@ func NewClassController(s storage.Storage) ClassController {
 func (cc *classController) CreateClass(c *gin.Context) {
 	var req models.CreateClassRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("Invalid request, missing request params: %v\n", err)
 		errors.ErrInvalidRequest.Respond(c)
 		return
 	}
 	if req.EndDate.Time().Before(req.StartDate.Time()) {
+		log.Printf("Invalid request: %v\n", errors.ErrDateMismatch.Message)
 		errors.ErrDateMismatch.Respond(c)
 		return
 	}
@@ -51,9 +54,11 @@ func (cc *classController) CreateClass(c *gin.Context) {
 		Capacity:  req.Capacity,
 	})
 	if err != nil {
+		log.Printf("Failed inserting class to db: %v\n", err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 		return
 	}
+	log.Printf("Class created successfully: %v\n", newClass)
 	c.JSON(http.StatusCreated, newClass)
 }
 
@@ -71,5 +76,6 @@ func (cc *classController) GetClasses(c *gin.Context) {
 		errors.ErrInternalServer.Respond(c)
 		return
 	}
+	log.Printf("Returning available classes\n")
 	c.JSON(http.StatusOK, classes)
 }

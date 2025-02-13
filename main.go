@@ -16,6 +16,7 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
+	log.Print("Started Glofox service")
 	r := gin.Default()
 
 	// Initialize storage with an in-memory implementation
