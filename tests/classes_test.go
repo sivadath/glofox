@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"path"
 	"testing"
 	"time"
 
@@ -110,7 +111,7 @@ func TestCreateClass(t *testing.T) {
 			reqBody, err := json.Marshal(tt.requestBody)
 			assert.NoError(t, err)
 
-			req, err := http.NewRequest(http.MethodPost, routes.Version+routes.EndPointClasses, bytes.NewBuffer(reqBody))
+			req, err := http.NewRequest(http.MethodPost, path.Join(routes.Version, routes.EndPointClasses), bytes.NewBuffer(reqBody))
 			assert.NoError(t, err)
 
 			w := httptest.NewRecorder()

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"path"
 	"testing"
 	"time"
 
@@ -132,7 +133,7 @@ func sendRequest(t *testing.T, r http.Handler, requestBody map[string]interface{
 	reqBody, err := json.Marshal(requestBody)
 	assert.NoError(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, routes.Version+routes.EndPointBookings, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest(http.MethodPost, path.Join(routes.Version, routes.EndPointBookings), bytes.NewBuffer(reqBody))
 	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
