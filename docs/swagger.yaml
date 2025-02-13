@@ -1,23 +1,7 @@
 basePath: /
 definitions:
-  controllers.CreateBookingRequest:
-    description: Create a new booking with the provided details
+  errors.APIError:
     properties:
-      date:
-        description: '@Description Date for the booking in YYYY-MM-DD format'
-        type: string
-      name:
-        description: '@Description Name of the person making the booking'
-        type: string
-    required:
-    - date
-    - name
-    type: object
-  controllers.ErrorResponse:
-    description: Standard error response structure
-    properties:
-      details:
-        type: string
       error:
         type: string
     type: object
@@ -56,6 +40,19 @@ definitions:
         description: '@Description Start date of the class in YYYY-MM-DD format'
         type: string
     type: object
+  models.CreateBookingRequest:
+    description: Create a new booking with the provided details
+    properties:
+      date:
+        description: '@Description Date for the booking in YYYY-MM-DD format'
+        type: string
+      name:
+        description: '@Description Name of the person making the booking'
+        type: string
+    required:
+    - date
+    - name
+    type: object
   models.CreateClassRequest:
     description: Class creation request
     properties:
@@ -71,6 +68,11 @@ definitions:
       start_date:
         description: '@Description Start date of the class in YYYY-MM-DD format'
         type: string
+    required:
+    - capacity
+    - end_date
+    - name
+    - start_date
     type: object
 host: localhost:8080
 info:
@@ -96,7 +98,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/errors.APIError'
       tags:
       - Booking
     post:
@@ -108,7 +110,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/controllers.CreateBookingRequest'
+          $ref: '#/definitions/models.CreateBookingRequest'
       produces:
       - application/json
       responses:
@@ -119,11 +121,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/errors.APIError'
+        "422":
+          description: No classes found for given date
+          schema:
+            $ref: '#/definitions/errors.APIError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/errors.APIError'
       summary: Create a new booking
       tags:
       - Booking
@@ -144,7 +150,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/errors.APIError'
       tags:
       - Class
     post:
@@ -168,11 +174,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/errors.APIError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/errors.APIError'
       tags:
       - Class
 swagger: "2.0"

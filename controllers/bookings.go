@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/sivadath/glofox/internal/errors"
 	"github.com/sivadath/glofox/models"
 	"github.com/sivadath/glofox/storage"
-	"log"
 	"net/http"
 	"time"
 )
 
+// BookingController defines handlers for booking-related endpoints.
 type BookingController interface {
 	CreateBooking(c *gin.Context)
 	GetBookings(c *gin.Context)
@@ -19,106 +20,89 @@ type bookingController struct {
 	storage storage.Storage
 }
 
-// NewBookingController returns an instance of BookingController
+// NewBookingController initializes a new booking controller.
 func NewBookingController(s storage.Storage) BookingController {
 	return &bookingController{storage: s}
 }
 
-// CreateBookingRequest represents the request body for creating a new booking
-// @Description Create a new booking with the provided details
-// @Tags Booking
-// @Accept json
-// @Produce json
-// @Param request body CreateBookingRequest true "Booking Information"
-// @Success 201 {object} models.Booking "Booking created successfully"
-// @Failure 400 {object} ErrorResponse "Invalid input"
-// @Failure 500 {object} ErrorResponse "Internal server error"
-// @Router /bookings [post]
-type CreateBookingRequest struct {
-	Name string `json:"name" binding:"required"` // @Description Name of the person making the booking
-	Date string `json:"date" binding:"required"` // @Description Date for the booking in YYYY-MM-DD format
-}
-
-// CreateBooking handles the creation of a new booking
+// CreateBooking handles the creation of a new booking.
 // @Summary Create a new booking
 // @Tags Booking
 // @Accept json
 // @Produce json
-// @Param request body CreateBookingRequest true "Booking Information"
+// @Param request body models.CreateBookingRequest true "Booking Information"
 // @Success 201 {object} models.Booking "Booking created successfully"
-// @Failure 400 {object} ErrorResponse "Invalid input"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 400 {object} errors.APIError "Invalid input"
+// @Failure 422 {object} errors.APIError "No classes found for given date"
+// @Failure 500 {object} errors.APIError "Internal server error"
 // @Router /bookings [post]
 func (bc *bookingController) CreateBooking(c *gin.Context) {
-	var req CreateBookingRequest
+	var req models.CreateBookingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Printf("Invalid request params: %v\n", err)
+		log.Errorf("Invalid request body: %v", err)
 		errors.ErrInvalidRequest.Respond(c)
 		return
 	}
 
-	booking := models.Booking{
-		Name: req.Name,
-		Date: req.Date,
-	}
+	// Parse the date string into a standard format
 	date, err := time.Parse(time.DateOnly, req.Date)
 	if err != nil {
-		log.Printf("Unexpected data format: %v, supported format (2006-01-02 for 2nd jan 2006)\n", err)
-		errors.NewError(err.Error(), http.StatusBadRequest).Respond(c)
+		log.Errorf("Invalid date format (%s), expected YYYY-MM-DD: %v", req.Date, err)
+		errors.NewError("Invalid date format, expected YYYY-MM-DD", http.StatusBadRequest).Respond(c)
 		return
 	}
+
+	// Retrieve available classes for the given date
 	classes, err := bc.storage.GetClassesByDate(c, date)
 	if err != nil {
-		log.Printf("Failed to fetch classes for given date: %v\n", err)
+		log.Errorf("Database error while retrieving classes for date %s: %v", date, err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 		return
 	}
 
+	// If no classes are available, return an appropriate response
 	if len(classes) == 0 {
-		log.Printf("No classes found for given %s: %v\n", date.String(), errors.ErrNoClassesFound)
+		log.Errorf("No available classes for the given date: %s", date)
 		errors.ErrNoClassesFound.Respond(c)
 		return
 	}
-	// For simplicity considering only first class fetched among all available classes
-	booking.ClassID = classes[0].ID
 
+	// Assign the first available class (simplified logic for now)
+	booking := models.Booking{
+		Name:    req.Name,
+		Date:    req.Date,
+		ClassID: classes[0].ID,
+	}
+
+	// Store the new booking in the database
 	newBooking, err := bc.storage.AddBooking(c, booking)
 	if err != nil {
-		log.Printf("Failed to insert bookings to db: %v\n", err)
+		log.Errorf("Failed to insert booking into database: %v", err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 		return
 	}
-	log.Printf("Booking created successfully: %v\n", newBooking)
+
+	log.Infof("Booking successfully created: %+v", newBooking)
 	c.JSON(http.StatusCreated, newBooking)
 }
 
-// GetBookings retrieves a list of all bookings
+// GetBookings retrieves all existing bookings.
 // @Description Get a list of all bookings
 // @Tags Booking
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.Booking "List of bookings"
-// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Failure 500 {object} errors.APIError "Internal server error"
 // @Router /bookings [get]
 func (bc *bookingController) GetBookings(c *gin.Context) {
+	// Fetch all bookings from storage
 	bookings, err := bc.storage.GetBookings(c)
 	if err != nil {
-		log.Printf("Failed to fetch available bookings: %v\n", err)
+		log.Errorf("Database error while retrieving bookings: %v", err)
 		errors.NewError(err.Error(), http.StatusInternalServerError).Respond(c)
 		return
 	}
-	log.Printf("Returning available bookings")
-	c.JSON(http.StatusOK, bookings)
-}
 
-// ErrorResponse defines the structure of an error response
-// @Description Standard error response structure
-// @Tags General
-// @Accept json
-// @Produce json
-// @Property error string "Error message"
-// @Property details string "Additional error details" optional
-type ErrorResponse struct {
-	Error   string `json:"error"`
-	Details string `json:"details,omitempty"`
+	log.Infof("Returning %d bookings", len(bookings))
+	c.JSON(http.StatusOK, bookings)
 }

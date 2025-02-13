@@ -40,7 +40,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/errors.APIError"
                         }
                     }
                 }
@@ -63,7 +63,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.CreateBookingRequest"
+                            "$ref": "#/definitions/models.CreateBookingRequest"
                         }
                     }
                 ],
@@ -77,13 +77,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/errors.APIError"
+                        }
+                    },
+                    "422": {
+                        "description": "No classes found for given date",
+                        "schema": {
+                            "$ref": "#/definitions/errors.APIError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/errors.APIError"
                         }
                     }
                 }
@@ -114,7 +120,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/errors.APIError"
                         }
                     }
                 }
@@ -151,13 +157,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/errors.APIError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/errors.APIError"
                         }
                     }
                 }
@@ -165,31 +171,9 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "controllers.CreateBookingRequest": {
-            "description": "Create a new booking with the provided details",
-            "type": "object",
-            "required": [
-                "date",
-                "name"
-            ],
-            "properties": {
-                "date": {
-                    "description": "@Description Date for the booking in YYYY-MM-DD format",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "@Description Name of the person making the booking",
-                    "type": "string"
-                }
-            }
-        },
-        "controllers.ErrorResponse": {
-            "description": "Standard error response structure",
+        "errors.APIError": {
             "type": "object",
             "properties": {
-                "details": {
-                    "type": "string"
-                },
                 "error": {
                     "type": "string"
                 }
@@ -243,9 +227,33 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CreateBookingRequest": {
+            "description": "Create a new booking with the provided details",
+            "type": "object",
+            "required": [
+                "date",
+                "name"
+            ],
+            "properties": {
+                "date": {
+                    "description": "@Description Date for the booking in YYYY-MM-DD format",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "@Description Name of the person making the booking",
+                    "type": "string"
+                }
+            }
+        },
         "models.CreateClassRequest": {
             "description": "Class creation request",
             "type": "object",
+            "required": [
+                "capacity",
+                "end_date",
+                "name",
+                "start_date"
+            ],
             "properties": {
                 "capacity": {
                     "description": "@Description Maximum capacity of the class",
