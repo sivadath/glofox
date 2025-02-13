@@ -10,6 +10,6 @@ func RegisterClassRoutes(r *gin.Engine) {
 	cc := controllers.NewClassController(storage.DB)
 	classRoutes := r.Group(Version + "/classes")
 
-	classRoutes.POST("/", cc.CreateClass)
-	classRoutes.GET("/", cc.GetClasses)
+	classRoutes.POST("", cc.CreateClass)
+	classRoutes.GET("", cc.GetClasses)
 }

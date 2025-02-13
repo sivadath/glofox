@@ -11,6 +11,6 @@ const Version = "/api/v1"
 func RegisterBookingRoutes(r *gin.Engine) {
 	bc := controllers.NewBookingController(storage.DB)
 	bookingRoutes := r.Group(Version + "/bookings")
-	bookingRoutes.POST("/", bc.CreateBooking)
-	bookingRoutes.GET("/", bc.GetBookings)
+	bookingRoutes.POST("", bc.CreateBooking)
+	bookingRoutes.GET("", bc.GetBookings)
 }

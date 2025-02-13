@@ -39,7 +39,7 @@ func (cc *classController) CreateClass(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if req.EndDate.Time().After(req.StartDate.Time()) {
+	if req.EndDate.Time().Before(req.StartDate.Time()) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "end time cannot be later to start time"})
 		return
 	}

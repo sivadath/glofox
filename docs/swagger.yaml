@@ -56,6 +56,22 @@ definitions:
         description: '@Description Start date of the class in YYYY-MM-DD format'
         type: string
     type: object
+  models.CreateClassRequest:
+    description: Class creation request
+    properties:
+      capacity:
+        description: '@Description Maximum capacity of the class'
+        type: integer
+      end_date:
+        description: '@Description End date of the class in YYYY-MM-DD format'
+        type: string
+      name:
+        description: '@Description Name of the class'
+        type: string
+      start_date:
+        description: '@Description Start date of the class in YYYY-MM-DD format'
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -141,7 +157,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Class'
+          $ref: '#/definitions/models.CreateClassRequest'
       produces:
       - application/json
       responses:

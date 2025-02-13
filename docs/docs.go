@@ -137,7 +137,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Class"
+                            "$ref": "#/definitions/models.CreateClassRequest"
                         }
                     }
                 ],
@@ -231,6 +231,28 @@ const docTemplate = `{
                 },
                 "id": {
                     "description": "@Description ID of the class",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "@Description Name of the class",
+                    "type": "string"
+                },
+                "start_date": {
+                    "description": "@Description Start date of the class in YYYY-MM-DD format",
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateClassRequest": {
+            "description": "Class creation request",
+            "type": "object",
+            "properties": {
+                "capacity": {
+                    "description": "@Description Maximum capacity of the class",
+                    "type": "integer"
+                },
+                "end_date": {
+                    "description": "@Description End date of the class in YYYY-MM-DD format",
                     "type": "string"
                 },
                 "name": {
