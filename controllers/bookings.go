@@ -71,7 +71,7 @@ func (bc *bookingController) CreateBooking(c *gin.Context) {
 	if len(classes) == 0 {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
-	//For simplicity considering only first class fetched among all available classes
+	// For simplicity considering only first class fetched among all available classes
 	booking.ClassID = classes[0].ID
 
 	newBooking, err := bc.storage.AddBooking(c, booking)

@@ -7,6 +7,7 @@ import (
 	"github.com/sivadath/glofox/storage"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
 )
 
 // @title Glofox API
@@ -29,5 +30,5 @@ func main() {
 	routes.RegisterClassRoutes(r)
 	routes.RegisterBookingRoutes(r)
 
-	r.Run(":8080")
+	log.Fatal(r.Run(":8080"))
 }

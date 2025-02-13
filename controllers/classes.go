@@ -28,22 +28,27 @@ func NewClassController(s storage.Storage) ClassController {
 // @Tags Class
 // @Accept json
 // @Produce json
-// @Param request body models.Class true "Class Information"
+// @Param request body models.CreateClassRequest true "Class Information"
 // @Success 201 {object} models.Class "Class created successfully"
 // @Failure 400 {object} ErrorResponse "Invalid input"
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /classes [post]
 func (cc *classController) CreateClass(c *gin.Context) {
-	var class models.Class
-	if err := c.ShouldBindJSON(&class); err != nil {
+	var req models.CreateClassRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if class.EndDate.Time().After(class.StartDate.Time()) {
+	if req.EndDate.Time().After(req.StartDate.Time()) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "end time cannot be later to start time"})
 		return
 	}
-	newClass, err := cc.storage.AddClass(c, class)
+	newClass, err := cc.storage.AddClass(c, models.Class{
+		Name:      req.Name,
+		StartDate: req.StartDate,
+		EndDate:   req.EndDate,
+		Capacity:  req.Capacity,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}

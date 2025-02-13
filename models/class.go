@@ -25,6 +25,22 @@ type Class struct {
 	Capacity  int    `json:"capacity"`   // @Description Maximum capacity of the class
 }
 
+// CreateClassRequest represents the request body for creating a new class
+// @Description Class creation request
+// @Tags Class
+// @Accept json
+// @Produce json
+// @Property Name string "Name of the class"
+// @Property StartDate string "Start date of the class"
+// @Property EndDate string "End date of the class"
+// @Property Capacity int "Maximum capacity of the class"
+type CreateClassRequest struct {
+	Name      string `json:"name"`       // @Description Name of the class
+	StartDate Date   `json:"start_date"` // @Description Start date of the class in YYYY-MM-DD format
+	EndDate   Date   `json:"end_date"`   // @Description End date of the class in YYYY-MM-DD format
+	Capacity  int    `json:"capacity"`   // @Description Maximum capacity of the class
+}
+
 type Date time.Time
 
 func (d *Date) UnmarshalJSON(data []byte) error {
