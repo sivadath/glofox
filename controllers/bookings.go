@@ -33,6 +33,7 @@ func NewBookingController(s storage.Storage) BookingController {
 // @Param request body models.CreateBookingRequest true "Booking Information"
 // @Success 201 {object} models.Booking "Booking created successfully"
 // @Failure 400 {object} errors.APIError "Invalid input"
+// @Failure 422 {object} errors.APIError "No classes found for given date"
 // @Failure 500 {object} errors.APIError "Internal server error"
 // @Router /bookings [post]
 func (bc *bookingController) CreateBooking(c *gin.Context) {

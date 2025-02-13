@@ -80,6 +80,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/errors.APIError"
                         }
                     },
+                    "422": {
+                        "description": "No classes found for given date",
+                        "schema": {
+                            "$ref": "#/definitions/errors.APIError"
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
