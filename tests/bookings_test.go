@@ -99,7 +99,7 @@ func TestCreateBooking(t *testing.T) {
 			expectedResponse: map[string]interface{}{
 				"error": errors.ErrNoClassesFound.Message,
 			},
-			expectedStatus: http.StatusInternalServerError,
+			expectedStatus: http.StatusUnprocessableEntity,
 		},
 	}
 

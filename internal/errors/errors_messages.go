@@ -13,7 +13,7 @@ var (
 	ErrInvalidCapacity  = NewError("capacity must be greater than zero", http.StatusBadRequest)
 	ErrDateMismatch     = NewError("end_date cannot be before start_date", http.StatusBadRequest)
 	ErrInternalServer   = NewError("internal server error", http.StatusInternalServerError)
-	ErrNoClassesFound   = NewError("no classes found for given request", http.StatusInternalServerError)
+	ErrNoClassesFound   = NewError("no classes found for given request", http.StatusUnprocessableEntity)
 )
 
 // APIError represents a standard error response.
